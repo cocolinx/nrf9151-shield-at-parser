@@ -11,6 +11,8 @@
 CShield_v2 test;
 CShield_v2::UrcPacket _urcPacket;
 
+int32_t handle;
+
 void setup() {
 	int32_t ret;
 
@@ -35,7 +37,6 @@ void setup() {
   {
     Serial.print("error: ");
     Serial.println(ret);
-    return false;
   }
   else
   {
@@ -48,7 +49,6 @@ void setup() {
   {
     Serial.print("error: ");
     Serial.println(ret);
-    return false;
   }
   else
   {
@@ -64,13 +64,12 @@ void setup() {
     {
       Serial.print("error: ");
       Serial.println(ret);
-      return false;
     }
     if(ret & URC_CEREG)
     {
       Serial.print("cereg: ");
       Serial.println(_urcPacket.cereg);
-      if(_urcPacket.cereg == 1)
+      if(_urcPacket.cereg == 5)
       {
         connected = true;
         break;
@@ -86,17 +85,13 @@ void setup() {
     while (1);
   }
   else Serial.println("lte connection success");
-}
 
-void loop() {
-  int32_t ret, handle;
   Serial.print("open udp socket...");
   ret = test.cx_socket(1, 2, 0, &handle);
   if(ret < 0)
   {
     Serial.print("error: ");
     Serial.println(ret);
-    return false;
   }
   else
   {
@@ -109,12 +104,17 @@ void loop() {
   {
     Serial.print("error: ");
     Serial.println(ret);
-    return false;
   }
   else
   {
     Serial.println("okay");
   }
+}
+
+void loop() {
+  static int32_t txcnt = 0;
+
+  int32_t ret;
 
   Serial.print("udp send...");
   char udpTx[] = "hello udp cocolinx~~";
@@ -123,11 +123,11 @@ void loop() {
   {
     Serial.print("error: ");
     Serial.println(ret);
-    return false;
   }
   else
   {
     Serial.println("okay");
+    txcnt++;
   }
 
   Serial.print("udp recv data(max 15 secs)...");
@@ -138,7 +138,6 @@ void loop() {
   {
     Serial.print("error: ");
     Serial.println(rxcnt);
-    return false;
   }
   else
   {
@@ -148,16 +147,20 @@ void loop() {
     Serial.println(udpRx);
   }
 
-  Serial.print("udp close...");
-  ret = test.cx_close(handle);
-  if(ret < 0)
+  if(txcnt >= 30)
   {
-    Serial.print("error: ");
-    Serial.println(ret);
-    return false;
+    Serial.print("udp close...");
+    ret = test.cx_close(handle);
+    if(ret < 0)
+    {
+      Serial.print("error: ");
+      Serial.println(ret);
+    }
+    else
+    {
+      Serial.println("okay");
+    }
   }
-  else
-  {
-    Serial.println("okay");
-  }
+
+  delay(10000);
 }

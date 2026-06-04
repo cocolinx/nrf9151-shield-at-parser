@@ -41,7 +41,6 @@ void setup() {
   {
     Serial.print("error: ");
     Serial.println(ret);
-    return false;
   }
   else
   {
@@ -54,7 +53,6 @@ void setup() {
   {
     Serial.print("error: ");
     Serial.println(ret);
-    return false;
   }
   else
   {
@@ -70,13 +68,12 @@ void setup() {
     {
       Serial.print("error: ");
       Serial.println(ret);
-      return false;
     }
     if(ret & URC_CEREG)
     {
       Serial.print("cereg: ");
       Serial.println(_urcPacket.cereg);
-      if(_urcPacket.cereg == 1)
+      if(_urcPacket.cereg == 5)
       {
         connected = true;
         break;
@@ -105,7 +102,6 @@ void setup() {
   {
     Serial.print("error: ");
     Serial.println(ret);
-    return false;
   }
   else
   {
@@ -119,14 +115,13 @@ void setup() {
   {
     Serial.print("error: ");
     Serial.println(ret);
-    return false;
   }
   else
   {
     Serial.println("okay");
   }
 
-  uint32_t start = millis();
+  start = millis();
   bool done = false;
   while(millis() - start < 5000)
   {
@@ -135,7 +130,6 @@ void setup() {
     {
       Serial.print("error: ");
       Serial.println(ret);
-      return false;
     }
     if(ret & URC_MQTT_EVT)
     {
@@ -166,7 +160,6 @@ void setup() {
   {
     Serial.print("error: ");
     Serial.println(ret);
-    return false;
   }
   else
   {
@@ -182,7 +175,6 @@ void setup() {
     {
       Serial.print("error: ");
       Serial.println(ret);
-      return false;
     }
     if(ret & URC_MQTT_EVT)
     {
@@ -204,7 +196,7 @@ void setup() {
 
 void loop() {
   static uint32_t pubCount = 0;
-
+  int32_t ret;
   ///////////////////// mqtt publish
   Serial.print("mqtt_tls topic \"cocolinx/test/tls\" publish...");
   char mqttTx[] = "hello mqtt_tls cocolinx~~";
@@ -213,7 +205,6 @@ void loop() {
   {
     Serial.print("error: ");
     Serial.println(ret); 
-    return false;
   }
   else
   {
@@ -221,7 +212,7 @@ void loop() {
     pubCount++;
   }
   
-  start = millis();
+  uint32_t start = millis();
   while(millis() - start < 5000)
   {
     ret = test.read_urc_pkt(&_urcPacket);
@@ -229,7 +220,6 @@ void loop() {
     {
       Serial.print("error: ");
       Serial.println(ret);
-      return false;
     }
     if(ret & URC_MQTT_EVT)
     {
@@ -249,7 +239,7 @@ void loop() {
     delay(500);
   }
 
-  if(pubCount >= 10)
+  if(pubCount >= 30)
   {
     ///////////////////// mqtt unsubscribe
     Serial.print("mqtt_tls topic \"cocolinx/test/tls\" unsubscribe...");
@@ -258,7 +248,6 @@ void loop() {
     {
       Serial.print("error: ");
       Serial.println(ret);
-      return false;
     }
     else
     {
@@ -273,7 +262,6 @@ void loop() {
     {
       Serial.print("error: ");
       Serial.println(ret);
-      return false;
     }
     else
     {
@@ -286,4 +274,5 @@ void loop() {
     Serial.println("MQTT_TLS test finished");
     while(1);
   }
+  delay(10000);
 }

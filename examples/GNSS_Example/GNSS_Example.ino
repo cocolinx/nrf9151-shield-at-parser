@@ -37,7 +37,6 @@ void setup() {
   {
     Serial.print("error: ");
     Serial.println(ret);
-    return false;
   }
   else
   {
@@ -54,7 +53,6 @@ void setup() {
   {
     Serial.print("error: ");
     Serial.println(ret);
-    return false;
   }
   else
   {
@@ -65,15 +63,15 @@ void setup() {
 void loop() {
   static uint32_t start = millis();
   bool done = false;
+  int32_t ret;
 
-  if(millis() - start < 60000)
+  while(millis() - start < 60000)
   {
     ret = test.read_urc_pkt(&_urcPacket);
     if(ret < 0)
     {
       Serial.print("error: ");
       Serial.println(ret);
-      return false;
     }
     if(ret & URC_GNSS_EVT)
     {
@@ -91,23 +89,7 @@ void loop() {
       done = true;
       break;
     }
-  }
-  else
-  {
-    Serial.println("timeout");
-    Serial.print("gnss stop...");
-    ret = test.cx_gnss_stop();
-    if(ret < 0)
-    {
-      Serial.print("error: ");
-      Serial.println(ret);
-      return false;
-    }
-    else
-    {
-      Serial.println("okay");
-      while(1);
-    }
+    delay(1000);
   }
 
   if(done) 
@@ -119,7 +101,6 @@ void loop() {
     {
       Serial.print("error: ");
       Serial.println(ret);
-      return false;
     }
     else
     {
@@ -127,5 +108,20 @@ void loop() {
       while(1);
     }
   }
-  delay(1000);
+  else
+  {
+    Serial.println("timeout");
+    Serial.print("gnss stop...");
+    ret = test.cx_gnss_stop();
+    if(ret < 0)
+    {
+      Serial.print("error: ");
+      Serial.println(ret);
+    }
+    else
+    {
+      Serial.println("okay");
+      while(1);
+    }
+  }
 }
