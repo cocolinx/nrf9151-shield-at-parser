@@ -159,6 +159,7 @@ void loop() {
     else
     {
       Serial.println("okay");
+      while(1);
     }
   }
 
