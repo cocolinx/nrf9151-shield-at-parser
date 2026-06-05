@@ -4,7 +4,7 @@
 // PURPOSE: test all functions in library
 //     URL: https://github.com/cocolinx/Arduino-nRF9151_Shield_Library
 
-#include <CShield_v2.h>
+#include "CShield_v2.h"
 
 #define TEST_LTE_PLMN_SELECT 	CShield_v2::PLMN_SKT
 
@@ -561,6 +561,30 @@ bool sample_mqtt()
 
   if(!done) return false;
 
+  Serial.print("mqtt client info read...");
+  int32_t status, port;
+  char url[32];
+  ret = test.cx_get_mqtt_con(&status, url, sizeof(url), &port, NULL);
+  if(ret < 0)
+  {
+    Serial.print("error: ");
+    Serial.println(ret);
+    return false;
+  }
+  else
+  {
+    Serial.println("okay");
+    Serial.print("status: ");
+    Serial.println(status);
+    if(status != 0)
+    {
+      Serial.print("url: ");
+      Serial.println(url);
+      Serial.print("port: ");
+      Serial.println(port);
+    }
+  }
+
   Serial.print("mqtt topic \"cocolinx/test\" subscribe...");
   ret = test.cx_mqtt_sub("cocolinx/test", 0);
   if(ret < 0)
@@ -804,6 +828,32 @@ bool sample_mqtt_tls()
   }
 
   if(!done) return false;
+
+  Serial.print("mqtt_tls client info read...");
+  int32_t status, port, sec_tag;
+  char url[32];
+  ret = test.cx_get_mqtt_con(&status, url, sizeof(url), &port, &sec_tag);
+  if(ret < 0)
+  {
+    Serial.print("error: ");
+    Serial.println(ret);
+    return false;
+  }
+  else
+  {
+    Serial.println("okay");
+    Serial.print("status: ");
+    Serial.println(status);
+    if(status != 0)
+    {
+      Serial.print("url: ");
+      Serial.println(url);
+      Serial.print("port: ");
+      Serial.println(port);
+      Serial.print("sec_tag: ");
+      Serial.println(sec_tag);
+    }
+  }
 
   Serial.print("mqtt_tls topic \"cocolinx/test/tls\" subscribe...");
   ret = test.cx_mqtt_sub("cocolinx/test/tls", 0);

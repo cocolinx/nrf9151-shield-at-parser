@@ -177,6 +177,7 @@ class CShield_v2 {
 
         /* MQTT client AT commands */
         int32_t cx_get_mqtt_cfg(char *client_id, int32_t max_size, int32_t *keep_alive, int32_t *clean_session);
+        int32_t cx_get_mqtt_con(int32_t *status, char *url, int32_t max_size, int32_t *port, int32_t *sec_tag);
 
         /* Socket AT commands */
         int32_t cx_get_socket(int32_t target_handle, int32_t *family, int32_t *role, int32_t *type);

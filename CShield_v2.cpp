@@ -1693,6 +1693,78 @@ int32_t CShield_v2::cx_get_mqtt_cfg(char *client_id, int32_t max_size, int32_t *
     return ACK_OKAY;
 }
 
+int32_t CShield_v2::cx_get_mqtt_con(int32_t *status, char *url, int32_t max_size, int32_t *port, int32_t *sec_tag)
+{
+    int32_t val;
+    char cmd[16];
+    bool ret;
+
+    strcpy(cmd, "AT#XMQTTCON?");
+
+    int32_t ack = transfer_pkt(cmd, 16, 15000);
+    if(ack != 0) return ack;
+
+    if(_parser.resp_code != AT_OK) return -(get_at_error_ack());
+    if(_parser.count < 2) return -(ACK_ERR_PARSE);
+    
+    int32_t index = find_prefix_token("#XMQTTCON");
+    if(index < 0) return -(ACK_ERR_PARSE);
+
+    ret = char_to_int32(&_parser.tokens[index + 1], &val);
+    if(!ret) return -(ACK_ERR_PARSE);
+
+    if(val == 0)
+    {
+        if(status != nullptr) *status = val;
+        return ACK_OKAY;
+    }
+    if(_parser.count == 5 && index + 4 < _parser.count) 
+    {
+        if(status != nullptr) *status = val;
+
+        if(url != nullptr)
+        {
+            int32_t len = _parser.tokens[index + 3].len;
+            trim_quote(&_parser.tokens[index + 3].buf, &len);
+            if(max_size <= len) return -(ACK_ERR_ARG);
+            memcpy(url, _parser.tokens[index + 3].buf, len);
+            url[len] = '\0';
+        }
+
+        ret = char_to_int32(&_parser.tokens[index + 4], &val);
+        if(!ret) return -(ACK_ERR_PARSE);
+
+        if(port != nullptr) *port = val;
+
+        return ACK_OKAY;
+    }
+
+    if(_parser.count == 6 && index + 5 < _parser.count) 
+    {
+        if(status != nullptr) *status = val;
+
+        if(url != nullptr)
+        {
+            int32_t len = _parser.tokens[index + 3].len;
+            trim_quote(&_parser.tokens[index + 3].buf, &len);
+            if(max_size <= len) return -(ACK_ERR_ARG);
+            memcpy(url, _parser.tokens[index + 3].buf, len);
+            url[len] = '\0';
+        }
+
+        ret = char_to_int32(&_parser.tokens[index + 4], &val);
+        if(!ret) return -(ACK_ERR_PARSE);
+
+        if(port != nullptr) *port = val;
+
+        ret = char_to_int32(&_parser.tokens[index + 5], &val);
+        if(!ret) return -(ACK_ERR_PARSE);
+
+        if(sec_tag != nullptr) *sec_tag = val;
+    }
+    return ACK_OKAY;
+}
+
 /* Socket AT commands */
 int32_t CShield_v2::cx_get_socket(int32_t target_handle, int32_t *family, int32_t *role, int32_t *type)
 {
