@@ -2,9 +2,9 @@
 //    FILE: FullTest_Example.ino
 //  AUTHOR: CocoLinx
 // PURPOSE: test all functions in library
-//     URL: https://github.com/cocolinx/Arduino-nRF9151_Shield_Library
+//     URL: https://github.com/cocolinx/nrf9151-shield-at-parser
 
-#include "CShield_v2.h"
+#include <CShield_v2.h>
 
 #define TEST_LTE_PLMN_SELECT 	CShield_v2::PLMN_SKT
 

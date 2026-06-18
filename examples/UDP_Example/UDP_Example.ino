@@ -1,8 +1,8 @@
 //
 //    FILE: UDP_Example.ino
 //  AUTHOR: CocoLinx
-// PURPOSE: test UDP socket communication
-//     URL: https://github.com/cocolinx/Arduino-nRF9151_Shield_Library
+// PURPOSE: Test UDP socket communication by send 30 messages and then stopping
+//     URL: https://github.com/cocolinx/nrf9151-shield-at-parser
 
 #include <CShield_v2.h>
 
