@@ -254,10 +254,6 @@ class CShield_v2 {
             int32_t at_error_code;
             AtToken tokens[TOKEN_SIZE_MAX];
         } AtParser;
-        
-        // HardwareSerial* _hwSerial;
-        // SoftwareSerial*  _swSerial;
-        // SerialType _serialType;
 
         char _pktbuf[RESPONSE_DATA_SIZE_MAX+8];
         char _urcbuf[RESPONSE_DATA_SIZE_MAX+8];
@@ -292,7 +288,6 @@ class CShield_v2 {
         bool is_empty_token(uint8_t token_index);
         
         int32_t char_to_hex(char c, uint8_t *x);
-        int32_t hex_to_char(uint8_t x, char *c);
         int32_t hex_to_bin(const char *hex, size_t hexlen, uint8_t *buf, size_t buflen);
         int32_t bin_to_hex(const uint8_t *buf, int32_t buflen, char *hex, int32_t hexlen);
 

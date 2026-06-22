@@ -26,3 +26,10 @@ A C++ based AT command parser library for CocoLinx nRF9151-Shield.
  - UDP_Example: Connect to LTE, open a UDP socket, and sends/receives data with an echo server.
 
 
+## License
+
+This project is primarily licensed under the MIT License.
+
+Some hexadecimal conversion utility code is derived from the Zephyr Project and is licensed under the Apache License 2.0.
+
+See LICENSES for details.

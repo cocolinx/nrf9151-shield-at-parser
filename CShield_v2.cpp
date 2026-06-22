@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2019 Nordic Semiconductor ASA
+ * Copyright (c) 2026 CocoLinx Co., Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * This file contains code derived from the Zephyr Project.
+ * Modified by CocoLinx Co., Ltd. in 2026.
+ */
+
 #include "CShield_v2.h"
 
 CShield_v2::CShield_v2() { }
@@ -270,9 +280,9 @@ int32_t CShield_v2::parse_urc_mqtt_evt(int32_t *evt_type, int32_t *result, const
     (*cursor) += 10;
     trim_left_space(cursor);
 
-    while(!is_end_line(*cursor))
+    while(!is_end_line(*cursor) && (*cursor)[0] != NULL_TERMINATOR)
     {
-        if((*cursor)[0] == COMMA && (*cursor)[0] != NULL_TERMINATOR) 
+        if((*cursor)[0] == COMMA)
         {
             ret = char_to_int32((*cursor) - length, length, &val);
             if(!ret) return -(ACK_ERR_PARSE);
@@ -679,7 +689,6 @@ int32_t CShield_v2::get_at_error_code()
 int32_t CShield_v2::set_cfun(int32_t fun)
 {
     char cmd[16];
-    bool ret;
 
     snprintf(cmd, 16, "AT+CFUN=%d", fun);
 
@@ -696,7 +705,6 @@ int32_t CShield_v2::set_cclk(char *time)
     if(time == nullptr) return -(ACK_ERR_ARG);
 
     char cmd[64];
-    bool ret;
 
     snprintf(cmd, 64, "AT+CCLK=\"%s\"", time);
 
@@ -714,7 +722,6 @@ int32_t CShield_v2::set_cgdcont(int32_t cid, char *pdp_type, char *apn)
     if(pdp_type == nullptr || apn == nullptr) return -(ACK_ERR_ARG);
 
     char cmd[64];
-    bool ret;
 
     snprintf(cmd, 64, "AT+CGDCONT=%d,\"%s\",\"%s\"", cid, pdp_type, apn);
 
@@ -730,7 +737,6 @@ int32_t CShield_v2::set_cgdcont(int32_t cid, char *pdp_type, char *apn)
 int32_t CShield_v2::set_cgatt(int32_t state)
 {
     char cmd[32];
-    bool ret;
 
     snprintf(cmd, 32, "AT+CGATT=%d", state);
 
@@ -746,7 +752,6 @@ int32_t CShield_v2::set_cgatt(int32_t state)
 int32_t CShield_v2::set_cops(int32_t mode, int32_t format, int32_t oper)
 {
     char cmd[32];
-    bool ret;
 
     if(mode == 0) snprintf(cmd, 32, "AT+COPS=%d", mode);
     else snprintf(cmd, 32, "AT+COPS=%d,%d,\"%d\"", mode, format, oper);
@@ -762,7 +767,6 @@ int32_t CShield_v2::set_cops(int32_t mode, int32_t format, int32_t oper)
 int32_t CShield_v2::set_cereg(int32_t n)
 {
     char cmd[32];
-    bool ret;
 
     snprintf(cmd, 32, "AT+CEREG=%d", n);
 
@@ -778,7 +782,6 @@ int32_t CShield_v2::set_cereg(int32_t n)
 int32_t CShield_v2::set_cmee(int32_t n)
 {
     char cmd[16];
-    bool ret;
 
     snprintf(cmd, 16, "AT+CMEE=%d", n);
 
@@ -794,7 +797,6 @@ int32_t CShield_v2::set_cmee(int32_t n)
 int32_t CShield_v2::cx_gnss_control(int32_t cloud_assistance, int32_t interval, int32_t timeout)
 {
     char cmd[64];
-    bool ret;
 
     if(interval == 1) snprintf(cmd, 64, "AT#XGNSS=1,%d,%d", cloud_assistance, interval);
     else snprintf(cmd, 64, "AT#XGNSS=1,%d,%d,%d", cloud_assistance, interval, timeout);
@@ -810,7 +812,6 @@ int32_t CShield_v2::cx_gnss_control(int32_t cloud_assistance, int32_t interval, 
 int32_t CShield_v2::cx_gnss_stop()
 {
     char cmd[16];
-    bool ret;
 
     strcpy(cmd, "AT#XGNSS=0");
 
@@ -825,7 +826,6 @@ int32_t CShield_v2::cx_gnss_stop()
 int32_t CShield_v2::cx_gnss_del(int32_t mask)
 {
     char cmd[32];
-    bool ret;
 
     snprintf(cmd, 32, "AT#XGNSSDEL=%d", mask);
 
@@ -842,7 +842,6 @@ int32_t CShield_v2::cx_gnss_del(int32_t mask)
 int32_t CShield_v2::cx_mqtt_cfg(const char *client_id, int32_t keep_alive, int32_t clean_session)
 {
     char cmd[128];
-    bool ret;
 
     snprintf(cmd, 128, "AT#XMQTTCFG=\"%s\",%d,%d", 
         (client_id == nullptr) ? "" : client_id, keep_alive, clean_session);
@@ -858,7 +857,6 @@ int32_t CShield_v2::cx_mqtt_cfg(const char *client_id, int32_t keep_alive, int32
 int32_t CShield_v2::cx_mqtt_con(int32_t op, const char *username, const char *password, const char *url, int32_t port)
 {
     char cmd[128];
-    bool ret;
 
     if(url == nullptr) return -(ACK_ERR_ARG);
 
@@ -876,7 +874,6 @@ int32_t CShield_v2::cx_mqtt_con(int32_t op, const char *username, const char *pa
 int32_t CShield_v2::cx_mqtt_disconnect()
 {
     char cmd[16];
-    bool ret;
 
     strcpy(cmd, "AT#XMQTTCON=0");
 
@@ -891,7 +888,6 @@ int32_t CShield_v2::cx_mqtt_disconnect()
 int32_t CShield_v2::cx_mqtt_con_secure(int32_t op, const char *username, const char *password, const char *url, int32_t port, int32_t sec_tag)
 {
     char cmd[128];
-    bool ret;
 
     if(url == nullptr) return -(ACK_ERR_ARG);
 
@@ -909,7 +905,6 @@ int32_t CShield_v2::cx_mqtt_con_secure(int32_t op, const char *username, const c
 int32_t CShield_v2::cx_mqtt_sub(const char *topic, int32_t qos)
 {
     char cmd[128];
-    bool ret;
 
     snprintf(cmd, 128, "AT#XMQTTSUB=\"%s\",%d", (topic == nullptr) ? "" : topic, qos);
 
@@ -926,7 +921,6 @@ int32_t CShield_v2::cx_mqtt_sub(const char *topic, int32_t qos)
 int32_t CShield_v2::cx_mqtt_unsub(const char *topic)
 {
     char cmd[128];
-    bool ret;
 
     if(topic == nullptr) return -(ACK_ERR_ARG);
     
@@ -945,7 +939,6 @@ int32_t CShield_v2::cx_mqtt_unsub(const char *topic)
 int32_t CShield_v2::cx_mqtt_pub(const char *topic, const uint8_t *msg, int32_t qos, int32_t retain)
 {
     char cmd[512];
-    bool ret;
 
     snprintf(cmd, 512, "AT#XMQTTPUB=\"%s\",\"%s\",%d,%d", topic, msg, qos, retain);
 
@@ -1019,7 +1012,6 @@ int32_t CShield_v2::cx_close(int32_t handle, int32_t *result)
 int32_t CShield_v2::cx_close_all()
 {
     char cmd[32];
-    bool ret;
 
     snprintf(cmd, 32, "AT#XCLOSE");
 
@@ -1034,7 +1026,6 @@ int32_t CShield_v2::cx_close_all()
 int32_t CShield_v2::cx_bind(int32_t handle, int32_t port)
 {
     char cmd[32];
-    bool ret;
 
     snprintf(cmd, 32, "AT#XBIND=%d,%d", handle, port);
 
@@ -1129,7 +1120,6 @@ int32_t CShield_v2::cx_send_to(int32_t handle, int32_t flags, const char *url, i
 int32_t CShield_v2::cx_rs485_enable(int32_t baudrate)
 {
     char cmd[32];
-    bool ret;
 
     snprintf(cmd, 64, "AT#XRS485EN=%d", baudrate);
 
@@ -1144,7 +1134,6 @@ int32_t CShield_v2::cx_rs485_enable(int32_t baudrate)
 int32_t CShield_v2::cx_rs485_disable()
 {
     char cmd[32];
-    bool ret;
 
     strcpy(cmd, "AT#XRS485EN=0");
 
@@ -1189,8 +1178,7 @@ int32_t CShield_v2::cx_rs485_tx(char *data, int32_t data_size)
 int32_t CShield_v2::get_cgmi(char *manufacturer, int32_t max_size)
 {
     char cmd[16];
-    bool ret;
-    
+
     strcpy(cmd, "AT+CGMI");
 
     int32_t ack = transfer_pkt(cmd, 1, 1000);
@@ -1213,7 +1201,6 @@ int32_t CShield_v2::get_cgmi(char *manufacturer, int32_t max_size)
 int32_t CShield_v2::get_cgmm(char *model, int32_t max_size)
 {
     char cmd[16];
-    bool ret;
     
     strcpy(cmd, "AT+CGMM");
 
@@ -1237,7 +1224,6 @@ int32_t CShield_v2::get_cgmm(char *model, int32_t max_size)
 int32_t CShield_v2::get_cgmr(char *revision, int32_t max_size)
 {
     char cmd[16];
-    bool ret;
 
     strcpy(cmd, "AT+CGMR");
 
@@ -1261,7 +1247,6 @@ int32_t CShield_v2::get_cgmr(char *revision, int32_t max_size)
 int32_t CShield_v2::get_imei(char *imei, int32_t max_size)
 {
     char cmd[16];
-    bool ret;
 
     strcpy(cmd, "AT+CGSN=1");
 
@@ -1289,7 +1274,6 @@ int32_t CShield_v2::get_imei(char *imei, int32_t max_size)
 int32_t CShield_v2::get_uuid(char *uuid, int32_t max_size)
 {
     char cmd[16];
-    bool ret;
 
     strcpy(cmd, "AT\%XMODEMUUID");
 
@@ -1398,7 +1382,6 @@ int32_t CShield_v2::get_band(int32_t *band)
 int32_t CShield_v2::get_cclk(char *time, uint8_t max_size)
 {
     char cmd[16];
-    bool ret;
 
     strcpy(cmd, "AT+CCLK?");
 
@@ -1574,7 +1557,6 @@ int32_t CShield_v2::get_cmee(int32_t *n)
 int32_t CShield_v2::get_imsi(char *imsi, int32_t max_size)
 {
     char cmd[16];
-    bool ret;
 
     strcpy(cmd, "AT+CIMI");
 
@@ -1598,7 +1580,6 @@ int32_t CShield_v2::get_imsi(char *imsi, int32_t max_size)
 int32_t CShield_v2::get_iccid(char *iccid, int32_t max_size)
 {
     char cmd[16];
-    bool ret;
 
     strcpy(cmd, "AT\%XICCID");
 
@@ -1817,7 +1798,6 @@ int32_t CShield_v2::cx_get_socket(int32_t target_handle, int32_t *family, int32_
 int32_t CShield_v2::cx_recv(int32_t handle, int32_t flags, int32_t timeout, uint8_t *data, int32_t max_size)
 {
     char cmd[32];
-    bool ret;
 
     snprintf(cmd, 32, "AT#XRECV=%d,0,%d,%d", handle, flags, timeout);
 
@@ -1849,7 +1829,6 @@ int32_t CShield_v2::cx_recv(int32_t handle, int32_t flags, int32_t timeout, char
 int32_t CShield_v2::cx_recv_from(int32_t handle, int32_t flags, int32_t timeout, uint8_t *data, int32_t max_size)
 {
     char cmd[32];
-    bool ret;
 
     snprintf(cmd, 32, "AT#XRECVFROM=%d,0,%d,%d", handle, flags, timeout);
 
@@ -1881,7 +1860,6 @@ int32_t CShield_v2::cx_recv_from(int32_t handle, int32_t flags, int32_t timeout,
 int32_t CShield_v2::cx_get_addr_info(const char *hostname, char *ip_addresses, int32_t max_size, int32_t address_family)
 {
     char cmd[64];
-    bool ret;
 
     snprintf(cmd, 64, "AT#XGETADDRINFO=\"%s\",%d", hostname, address_family);
 
@@ -2012,19 +1990,6 @@ int32_t CShield_v2::char_to_hex(char c, uint8_t *x)
 	return 0;
 }
 
-int32_t CShield_v2::hex_to_char(uint8_t x, char *c)
-{
-	if (x <= 9) {
-		*c = x + (char)'0';
-	} else  if (x <= 15) {
-		*c = x - 10 + (char)'a';
-	} else {
-		return -(ACK_ERR_PARSE);
-	}
-
-	return 0;
-}
-
 // return The length of the binary array, or 0 if an error occurred.
 int32_t CShield_v2::hex_to_bin(const char *hex, size_t hexlen, uint8_t *buf, size_t buflen)
 {
@@ -2063,14 +2028,26 @@ int32_t CShield_v2::hex_to_bin(const char *hex, size_t hexlen, uint8_t *buf, siz
 // return The length of the converted string, or 0 if an error occurred.
 int32_t CShield_v2::bin_to_hex(const uint8_t *buf, int32_t buflen, char *hex, int32_t hexlen)
 {
+    static const char hex_table[] = "0123456789ABCDEF";
+
+    if(buf == NULL) return 0;
+    if(hex == NULL) return 0;
+    if(buflen < 0) return 0;
+    if(hexlen <= 0) return 0;
+
 	if (hexlen < ((buflen * 2) + 1)) {
 		return 0;
 	}
 
-	for (int32_t i = 0; i < buflen; i++) {
-		hex_to_char(buf[i] >> 4, &hex[2 * i]);
-		hex_to_char(buf[i] & 0xf, &hex[2 * i + 1U]);
-	}
+    uint8_t value;
+
+    for(int32_t i = 0; i < buflen; i++) 
+    {
+        value = buf[i];
+
+        hex[i * 2]     = hex_table[(value >> 4) & 0x0F];
+        hex[i * 2 + 1] = hex_table[value & 0x0F];
+    }
 
 	hex[2 * buflen] = '\0';
 	return 2 * buflen;
