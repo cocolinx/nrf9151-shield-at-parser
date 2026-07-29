@@ -16,6 +16,8 @@
 
 #define TEST_INTERVAL_SECONDS 180
 
+#define MQTT_TLS_SEC_TAG 1010 // Replace with your own sec_tag
+
 CShield_v2 test;
 CShield_v2::UrcPacket _urcPacket;
 CShield_v2::GnssData  _gnssData;
@@ -521,7 +523,7 @@ bool sample_mqtt()
   }
 
   Serial.print("mqtt connect...");
-  ret = test.cx_mqtt_con(1, NULL, NULL, "broker.emqx.io", 1883);
+  ret = test.cx_mqtt_con(1, NULL, NULL, "echo.cocolinx.com", 1883);
   if(ret < 0)
   {
     Serial.print("error: ");
@@ -789,7 +791,7 @@ bool sample_mqtt_tls()
   }
 
   Serial.print("mqtt_tls connect...");
-  ret = test.cx_mqtt_con_secure(1, NULL, NULL, "broker.emqx.io", 8883, 5555);
+  ret = test.cx_mqtt_con_secure(1, NULL, NULL, "echo.cocolinx.com", 8883, MQTT_TLS_SEC_TAG);
   if(ret < 0)
   {
     Serial.print("error: ");

@@ -110,7 +110,7 @@ void setup() {
 
   ///////////////////// mqtt connect
   Serial.print("mqtt connect...");
-  ret = test.cx_mqtt_con(1, NULL, NULL, "broker.emqx.io", 1883);
+  ret = test.cx_mqtt_con(1, NULL, NULL, "echo.cocolinx.com", 1883);
   if(ret < 0)
   {
     Serial.print("error: ");

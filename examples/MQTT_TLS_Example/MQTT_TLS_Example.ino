@@ -10,6 +10,8 @@
 #define URC_MQTT_EVT  CShield_v2::ACK_URC_MQTT_EVT
 #define URC_MQTT_MSG  CShield_v2::ACK_URC_MQTT_MSG
 
+#define MQTT_TLS_SEC_TAG 1010 // Replace with your own sec_tag
+
 CShield_v2 test;
 CShield_v2::UrcPacket _urcPacket;
 
@@ -110,7 +112,7 @@ void setup() {
 
   ///////////////////// mqtt connect
   Serial.print("mqtt_tls connect...");
-  ret = test.cx_mqtt_con_secure(1, NULL, NULL, "broker.emqx.io", 8883, 5555);
+  ret = test.cx_mqtt_con_secure(1, NULL, NULL, "echo.cocolinx.com", 8883, MQTT_TLS_SEC_TAG);
   if(ret < 0)
   {
     Serial.print("error: ");
