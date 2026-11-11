@@ -43,9 +43,11 @@ class CShield_v2 {
         // * 10^6 before save
         typedef struct 
         {
+            // #XGNSS
             int32_t gnss_service;
             int32_t gnss_status;
 
+            // #XGNSSPOS
             int32_t latitude;
             int32_t longitude;
             int32_t altitude;
@@ -119,7 +121,7 @@ class CShield_v2 {
         int32_t cx_send(int32_t handle, int32_t flags, char *data, int32_t size);
         int32_t cx_send_to(int32_t handle, int32_t flags, const char *url, int32_t port, uint8_t *data, int32_t size);
         int32_t cx_send_to(int32_t handle, int32_t flags, const char *url, int32_t port, char *data, int32_t size);
-        
+
         /* RS485 custom AT commands */
         /**
          * @brief Enable RS485.
@@ -237,6 +239,7 @@ class CShield_v2 {
             URC_MQTTEVT,
             URC_XMQTTMSG,
             URC_XGNSS,
+            URC_XGNSSPOS,
             URC_UNKNOWN
         } UrcType;
         
@@ -303,6 +306,7 @@ class CShield_v2 {
         int32_t parse_urc_mqtt_msg(char *mqtt_topic, int32_t mqtt_topic_size, 
                                 char *mqtt_msg, int32_t mqtt_msg_size, const char **cursor, const char *end);
         int32_t parse_urc_gnss(GnssData *gnss_data, const char **cursor, const char *end);
+        int32_t parse_urc_gnss_pos(GnssData *gnss_data, const char **cursor, const char *end);
 };
 
 #endif // CSHIELD_V2_H

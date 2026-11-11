@@ -164,6 +164,7 @@ int32_t CShield_v2::get_urc_type(const char *str, const char *end)
     if(remain >= 10 && strncmp(str, "#XMQTTEVT:", 10) == 0) return URC_MQTTEVT;
     if(remain >= 10 && strncmp(str, "#XMQTTMSG:", 10) == 0) return URC_XMQTTMSG;
     if(remain >= 7 && strncmp(str, "#XGNSS:", 7) == 0) return URC_XGNSS;
+    if(remain >= 10 && strncmp(str, "#XGNSSPOS:", 10) == 0) return URC_XGNSSPOS;
 
     return URC_UNKNOWN;
 }
@@ -241,6 +242,9 @@ int32_t CShield_v2::urc_pkt_parser(UrcPacket *urc_packet, const char *end)
             case URC_XGNSS:
                 ack = parse_urc_gnss(&urc_packet->gnss_data, &cursor, end);
                 break;
+            case URC_XGNSSPOS:
+                ack = parse_urc_gnss_pos(&urc_packet->gnss_data, &cursor, end);
+                break;
             case URC_NONE: return ret;
         }
         if(ack < 0) return -(ACK_ERR_PARSE);
@@ -307,7 +311,6 @@ int32_t CShield_v2::parse_urc_mqtt_evt(int32_t *evt_type, int32_t *result, const
 
 int32_t CShield_v2::parse_urc_mqtt_msg(char *mqtt_topic, int32_t mqtt_topic_size, char *mqtt_msg, int32_t mqtt_msg_size, const char **cursor, const char *end)
 {
-    char buf[512];
     bool ret;
     int32_t topic_size, msg_size, remain;
     int32_t length = 0;
@@ -315,7 +318,6 @@ int32_t CShield_v2::parse_urc_mqtt_msg(char *mqtt_topic, int32_t mqtt_topic_size
     (*cursor) += 10;
     trim_left_space(cursor);
 
-    // 한줄 탐색
     while(!is_end_line(*cursor) && (*cursor)[0] != NULL_TERMINATOR)
     {
         if((*cursor)[0] == COMMA)
@@ -366,77 +368,67 @@ int32_t CShield_v2::parse_urc_mqtt_msg(char *mqtt_topic, int32_t mqtt_topic_size
 int32_t CShield_v2::parse_urc_gnss(GnssData *gnss_data, const char **cursor, const char *end)
 {
     bool ret;
-    int32_t comma_cnt = 0;
     int32_t length = 0;
-    int32_t val;
-
-    const char *check_ptr = *cursor;
 
     (*cursor) += 7;
     trim_left_space(cursor);
-
-    while(!is_end_line(check_ptr) && check_ptr[0] != NULL_TERMINATOR)
-    {
-        if(*check_ptr == COMMA)
-        {
-            comma_cnt++;
-            if(comma_cnt >= 2) break;
-        }
-        check_ptr++;
-    }
-
-    if(comma_cnt <= 1)
-    {
-        while(!is_end_line(*cursor) && (*cursor)[0] != NULL_TERMINATOR)
-        {
-            if((*cursor)[0] == COMMA)
-            {
-                ret = char_to_int32((*cursor) - length, length, &gnss_data->gnss_service);
-                if(!ret) return -(ACK_ERR_PARSE);
-                (*cursor)++;
-                length = 0;
-
-                continue;
-            }
-            (*cursor)++;
-            length++;
-        }
-
-        ret = char_to_int32((*cursor) - length, length, &gnss_data->gnss_status);
-        if(!ret) return -(ACK_ERR_PARSE);
-
-        return ACK_URC_GNSS_EVT;
-    }
-
-    comma_cnt = 0;
-
-    int32_t GnssData::*fields[] = {
-        &GnssData::latitude,
-        &GnssData::longitude,
-        &GnssData::altitude,
-        &GnssData::accuracy,
-        &GnssData::speed,
-        &GnssData::heading
-    };
-
-    int32_t field_idx = 0;
 
     while(!is_end_line(*cursor) && (*cursor)[0] != NULL_TERMINATOR)
     {
         if((*cursor)[0] == COMMA)
         {
-            ret = char_to_int32((*cursor) - length, length, &(gnss_data->*fields[field_idx]));
+            ret = char_to_int32((*cursor) - length, length, &gnss_data->gnss_service);
             if(!ret) return -(ACK_ERR_PARSE);
             (*cursor)++;
             length = 0;
-            field_idx++;
 
             continue;
         }
         (*cursor)++;
         length++;
     }
-    
+
+    ret = char_to_int32((*cursor) - length, length, &gnss_data->gnss_status);
+    if(!ret) return -(ACK_ERR_PARSE);
+
+    return ACK_URC_GNSS_EVT;
+}
+
+int32_t CShield_v2::parse_urc_gnss_pos(GnssData *gnss_data, const char **cursor, const char *end)
+{
+    bool ret;
+    int32_t length, field_idx;
+    int32_t *fields[] = {
+        &gnss_data->latitude,
+        &gnss_data->longitude,
+        &gnss_data->altitude,
+        &gnss_data->accuracy,
+        &gnss_data->speed,
+        &gnss_data->heading
+    };
+
+    length = 0;
+    field_idx = 0;
+
+    (*cursor) += 10;
+    trim_left_space(cursor);
+
+    while(!is_end_line(*cursor) && (*cursor)[0] != NULL_TERMINATOR)
+    {
+        if((*cursor)[0] == COMMA)
+        {
+            ret = char_to_int32((*cursor) - length, length, fields[field_idx]);
+            if(!ret) return -(ACK_ERR_PARSE);
+
+            (*cursor)++;
+            length = 0;
+            field_idx++;
+            continue;
+        }
+        (*cursor)++;
+        length++;
+    }
+
     const char *datetime_ptr = (*cursor) - length;
 
     if(field_idx == 6 && length > 0)
@@ -449,7 +441,6 @@ int32_t CShield_v2::parse_urc_gnss(GnssData *gnss_data, const char **cursor, con
 
     return ACK_URC_GNSS_DATA;
 }
-
 
 // send -> recv
 // return ack code(negative sign)
