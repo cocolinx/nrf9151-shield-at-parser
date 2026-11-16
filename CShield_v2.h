@@ -122,6 +122,11 @@ class CShield_v2 {
         int32_t cx_send_to(int32_t handle, int32_t flags, const char *url, int32_t port, uint8_t *data, int32_t size);
         int32_t cx_send_to(int32_t handle, int32_t flags, const char *url, int32_t port, char *data, int32_t size);
 
+        /* SMS AT commands */
+        int32_t cx_sms_start();
+        int32_t cx_sms_send(char *number, char *text, int32_t size);
+        int32_t cx_sms_stop();
+
         /* RS485 custom AT commands */
         /**
          * @brief Enable RS485.

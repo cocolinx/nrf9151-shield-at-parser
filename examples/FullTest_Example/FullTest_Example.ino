@@ -1168,6 +1168,44 @@ bool sample_gnss()
   return true;
 }
 
+bool sample_sms()
+{
+  int32_t ret;
+
+  Serial.println("*** sample_sms() ***");
+
+  Serial.print("start sms...");
+  ret = test.cx_sms_start();
+  if(ret < 0)
+  {
+    Serial.print("error: ");
+    Serial.println(ret);
+    return false;
+  }
+  Serial.println("okay");
+
+  Serial.print("send sms...");
+  char number[] = "+821030096112";
+  char smsTx[] = "hello sms cocolinx~~";
+  ret = test.cx_sms_send(number, smsTx, strlen(smsTx));
+  if(ret < 0)
+  {
+    Serial.print("error: ");
+    Serial.println(ret);
+    return false;
+  }
+  Serial.println("okay");
+
+  Serial.print("stop sms...");
+  ret = test.cx_sms_stop();
+  if(ret < 0)
+  {
+    Serial.print("error: ");
+    Serial.println(ret);
+    return false;
+  }
+  Serial.println("okay");
+}
 
 void setup() {
 	int32_t ret;
@@ -1215,6 +1253,7 @@ void loop() {
     sample_mqtt_tls();
     sample_rs485();
     sample_gnss();
+    sample_sms();
 
     Serial.println("===== test done =====");
     millisPrev = millis();

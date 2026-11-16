@@ -1107,6 +1107,54 @@ int32_t CShield_v2::cx_send_to(int32_t handle, int32_t flags, const char *url, i
     return cx_send_to(handle, flags, url, port, (uint8_t *)data, size);
 }
 
+/* SMS AT commands */
+int32_t CShield_v2::cx_sms_start()
+{
+    char cmd[16];
+
+    strcpy(cmd, "AT#XSMS=1");
+
+    int32_t ack = transfer_pkt(cmd, 16, 3000);
+    if(ack != 0) return ack;
+
+    if(_parser.resp_code != AT_OK) return -(get_at_error_ack());
+
+    return ACK_OKAY;
+}
+
+int32_t CShield_v2::cx_sms_send(char *number, char *text, int32_t size)
+{
+    char cmd[AT_TX_DATA_SIZE_MAX + 64];
+    bool ret;
+
+    if(number == nullptr) return -(ACK_ERR_ARG);
+    if(text == nullptr) return -(ACK_ERR_ARG);
+    if(size > AT_TX_BYTES_SIZE_MAX) return -(ACK_ERR_ARG);
+
+    snprintf(cmd, 512, "AT#XSMS=2,\"%s\",\"%s\"", number, text);
+
+    int32_t ack = transfer_pkt(cmd, 16, 10000);
+    if(ack != 0) return ack;
+
+    if(_parser.resp_code != AT_OK) return -(get_at_error_ack());
+
+    return ACK_OKAY;
+}
+
+int32_t CShield_v2::cx_sms_stop()
+{
+    char cmd[16];
+
+    strcpy(cmd, "AT#XSMS=0");
+
+    int32_t ack = transfer_pkt(cmd, 16, 3000);
+    if(ack != 0) return ack;
+
+    if(_parser.resp_code != AT_OK) return -(get_at_error_ack());
+
+    return ACK_OKAY;
+}
+
 /* RS485 custom AT commands */
 int32_t CShield_v2::cx_rs485_enable(int32_t baudrate)
 {
